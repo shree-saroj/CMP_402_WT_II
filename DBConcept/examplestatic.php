@@ -5,8 +5,9 @@
 
     $sql = "INSERT INTO webtech(Name,Password,CreatedDate) values (?, ?, ?)";
     try {
+        $date = date("Y-m-d H:i:s");
         $stmt = mysqli_prepare($conn, $sql);
-        mysqli_stmt_bind_param($stmt, "sss", $name, $password, );
+        mysqli_stmt_bind_param($stmt, "sss", $name, $password, $date);
         mysqli_stmt_execute($stmt);
         if (mysqli_stmt_affected_rows($stmt) > 0) {
             echo "Record inserted successfully.";
