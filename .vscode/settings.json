@@ -1,0 +1,7 @@
+{
+  "java.project.referencedLibraries": [
+    "lib/**/*.jar",
+    "/opt/tomcat/lib/servlet-api.jar",
+    "/home/s_saroj/.rsp/redhat-community-server-connector/runtimes/installations/tomcat-8.5.50/apache-tomcat-8.5.50/lib/servlet-api.jar"
+  ]
+}

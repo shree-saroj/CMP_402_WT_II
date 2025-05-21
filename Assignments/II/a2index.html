@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Shriyanka Bhandari" />
+    <title>Document</title>
+    <style>
+      .error {
+        color: red;
+      }
+      label {
+        display: block;
+        margin-top: 10px;
+      }
+      #btnaddupdateaddressbook {
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-right: 25px;
+      }
+      p {
+        margin: 0;
+        padding: 0;
+        font-size: 16px;
+      }
+      .row {
+        margin: 10px auto;
+        width: 50%;
+      }
+      #tbladdressbook {
+        border-collapse: collapse;
+        width: 100%;
+        margin: auto;
+      }
+      #tbladdressbook td,
+      #tbladdressbook th {
+        border: 1px solid #ddd;
+        padding: 8px;
+      }
+      #tbladdressbook tr:nth-child(even) {
+        background-color: #f2f2f2;
+      }
+      #tbladdressbook tr:hover {
+        background-color: #ddd;
+      }
+      #tbladdressbook th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #007bff;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="row">
+      <div>
+        <label>First Name</label>
+        <input id="inpfirstname" type="text" />
+        <p id="spnfnerror" class="error"></p>
+      </div>
+      <div>
+        <label>Desgination</label>
+        <input id="inpdesignation" type="text" />
+        <p id="spndesterror" class="error"></p>
+      </div>
+      <div>
+        <label>Address</label>
+        <input id="inpaddress" type="text" />
+        <button id="addaddress">+</button>
+        <p id="spnadderror" class="error"></p>
+      </div>
+      <div id="inputtedaddresses"></div>
+      <div>
+        <label>City</label>
+        <input id="inpcity" type="text" />
+        <p id="spncityerror" class="error"></p>
+      </div>
+      <div>
+        <label>State</label>
+        <input id="inpstate" type="text" />
+        <p id="spnstateerror" class="error"></p>
+      </div>
+      <div>
+        <label>Email</label>
+        <input id="inpemail" type="email" />
+        <p id="spnemailerror" class="error"></p>
+      </div>
+      <div>
+        <button id="btnaddupdateaddressbook" data-id="0">Add</button>
+        <input id="inpsearchlist" type="text" placeholder="search in list" />
+      </div>
+    </div>
+    <div class="row">
+      <table id="tbladdressbook">
+        <thead>
+          <tr>
+            <th>S.No</th>
+            <th>First Name</th>
+            <th>Designation</th>
+            <th>Address</th>
+            <th>City</th>
+            <th>State</th>
+            <th>Email</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <script src="./assets/jquery/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        loadAllAddressBooks();
+      });
+      $("#btnaddupdateaddressbook").on("click", async function () {
+        if ($("#inpfirstname").val() == "") {
+          $("#spnfnerror").text("First name is required");
+        } else {
+          $("#spnfnerror").text("");
+        }
+        if ($("#inpdesignation").val() == "") {
+          $("#spndesterror").text("Designation is required");
+        } else {
+          $("#spndesterror").text("");
+        }
+        if ($("#inputtedaddresses").children().length == 0) {
+          $("#spnadderror").text("Address is required");
+        } else {
+          $("#spnadderror").text("");
+        }
+        if ($("#inpcity").val() == "") {
+          $("#spncityerror").text("City is required");
+        } else {
+          $("#spncityerror").text("");
+        }
+        if ($("#inpstate").val() == "") {
+          $("#spnstateerror").text("State is required");
+        } else {
+          $("#spnstateerror").text("");
+        }
+        if ($("#inpemail").val() == "") {
+          $("#spnemailerror").text("Email is required");
+        } else {
+          $("#spnemailerror").text("");
+        }
+        if (
+          $("#inpfirstname").val() != "" &&
+          $("#inpdesignation").val() != "" &&
+          $("#inputtedaddresses").children().length != 0 &&
+          $("#inpcity").val() != "" &&
+          $("#inpstate").val() != "" &&
+          $("#inpemail").val() != ""
+        ) {
+          let addressObject = {};
+          $("#inputtedaddresses .address").each(function (i) {
+            addressObject[`Address_${i + 1}`] = $(this).text();
+          });
+          try {
+            let response = await $.ajax({
+              type: "POST",
+              url: "./a2.php",
+              data: {
+                id: $(this).data("id"),
+                addAddress: true,
+                firstname: $("#inpfirstname").val(),
+                designation: $("#inpdesignation").val(),
+                addresses: JSON.stringify(addressObject),
+                city: $("#inpcity").val(),
+                state: $("#inpstate").val(),
+                email: $("#inpemail").val(),
+              },
+            });
+            if (response > 0) {
+              await loadAllAddressBooks();
+              resetform();
+            } else {
+              alert("Email Already Taken");
+            }
+          } catch (error) {
+            console.log(error);
+          }
+        }
+      });
+      $("#addaddress").on("click", function () {
+        const address = $("#inpaddress").val();
+        if (address) {
+          $("#inputtedaddresses").append(
+            `<p><span class="address">${address}</span> <button class="removeaddress">-</button></p>`
+          );
+          $("#inpaddress").val("");
+        }
+      });
+      $(document).on("click", ".removeaddress", function () {
+        $(this).parent().remove();
+      });
+      async function loadAllAddressBooks() {
+        try {
+          let response = await $.ajax({
+            url: "./a2.php",
+            method: "POST",
+            data: {
+              getAllAddressBooks: true,
+            },
+          });
+          response = JSON.parse(response);
+          $("#tbladdressbook tbody").empty();
+          $.each(response, function (i, entry) {
+            const addressObject = JSON.parse(entry["Address"]);
+            const addressString = Object.entries(addressObject)
+              .map(([key, value]) => `${key}: ${value}`)
+              .join("<br/>");
+
+            $("#tbladdressbook tbody").append(
+              `<tr>
+                  <td>${i + 1}</td>
+                  <td>${entry["FirstName"]}</td>
+                  <td>${entry["Designation"]}</td>
+                  <td>${addressString}</td>
+                  <td>${entry["City"]}</td>
+                  <td>${entry["State"]}</td>
+                  <td>${entry["EmailId"]}</td>
+                  <td>
+                      <button class="updateaddressbook" data-id="${
+                        entry["PkId"]
+                      }">Update</button>
+                      <button class="deleteaddressbook" data-id="${
+                        entry["PkId"]
+                      }">Delete</button>
+                  </td>
+              </tr>`
+            );
+          });
+        } catch (err) {
+          alert("Something went wrong");
+        }
+      }
+      function resetform() {
+        $("#inpfirstname").val("");
+        $("#inpdesignation").val("");
+        $("#inputtedaddresses").empty();
+        $("#inpcity").val("");
+        $("#inpstate").val("");
+        $("#inpemail").val("");
+        $("#btnaddupdateaddressbook").attr("data-id", 0);
+        $("#btnaddupdateaddressbook").text("Add");
+      }
+      $(document).on("click", ".deleteaddressbook", async function () {
+        if (confirm("Are you sure?")) {
+          try {
+            let response = await $.ajax({
+              url: "./a2.php",
+              method: "POST",
+              data: {
+                deleteAddressBook: true,
+                id: $(this).attr("data-id"),
+              },
+            });
+            if (response > 0) {
+              await loadAllAddressBooks();
+            }
+          } catch (err) {
+            console.log(err);
+            alert("Something went wrong");
+          }
+        }
+      });
+
+      $(document).on("click", ".updateaddressbook", async function () {
+        try {
+          let response = await $.ajax({
+            url: "./a2.php",
+            method: "POST",
+            data: {
+              getAddressBookById: true,
+              id: $(this).attr("data-id"),
+            },
+          });
+          response = JSON.parse(response);
+          response = response[0];
+          $("#inpfirstname").val(response["FirstName"]);
+          $("#inpdesignation").val(response["Designation"]);
+          $("#inputtedaddresses").empty();
+          const addressObject = JSON.parse(response["Address"]);
+          $.each(addressObject, function (key, value) {
+            $("#inputtedaddresses").append(
+              `<p><span class="address">${value}</span> <button class="removeaddress">-</button></p>`
+            );
+          });
+          $("#inpcity").val(response["City"]);
+          $("#inpstate").val(response["State"]);
+          $("#inpemail").val(response["EmailId"]);
+          $("#btnaddupdateaddressbook").attr("data-id", response["PkId"]);
+          $("#btnaddupdateaddressbook").text("Update");
+        } catch (err) {
+          console.log(err);
+          alert("Something went wrong");
+        }
+      });
+      $(document).on("keyup", "#inpsearchlist", function () {
+        const filter = $(this).val();
+        $("#tbladdressbook tbody tr").each(function () {
+          if ($(this).text().toLowerCase().indexOf(filter.toLowerCase()) >= 0) {
+            $(this).show();
+          } else {
+            $(this).hide();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
