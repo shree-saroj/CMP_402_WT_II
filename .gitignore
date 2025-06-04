@@ -1,1 +1,28 @@
 /mail/credentials.json
+# Logs
+Project/auto-trust-frontend/logs
+Project/auto-trust-frontend/*.log
+Project/auto-trust-frontend/npm-debug.log*
+Project/auto-trust-frontend/yarn-debug.log*
+Project/auto-trust-frontend/yarn-error.log*
+Project/auto-trust-frontend/pnpm-debug.log*
+Project/auto-trust-frontend/lerna-debug.log*
+Project/auto-trust-frontend/pnpm-lock.yaml
+Project/auto-trust-frontend/package-lock.json
+Project/auto-trust-frontend/yarn.lock
+
+Project/auto-trust-frontend/node_modules
+Project/auto-trust-frontend/dist
+Project/auto-trust-frontend/dist-ssr
+Project/auto-trust-frontend/*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
